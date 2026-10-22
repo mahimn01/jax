@@ -1065,6 +1065,27 @@ class LaxScipySpecialFunctionsTest(jtu.JaxTestCase):
     }
     self.assertAllClose(jnp.array(hess), expected, atol=tol, rtol=tol)
 
+  def testBetalnLargeB(self):
+    # betaln switches to the algdiv series for max(a, b) >= 8, a range the
+    # random tests above do not reach.
+    a = np.array([1.0, 1.0, 1.0, 0.5, 2.5, 10.0, 3.0], dtype=np.float64)
+    b = np.array([8.0, 100.0, 1e6, 8.0, 12.0, 20.0, 1e3], dtype=np.float64)
+    # Reference values computed with mpmath at 50 digits.
+    expected = np.array([
+        -2.0794415416798357,
+        -4.605170185988092,
+        -13.815510557964274,
+        -0.4517409533108833,
+        -6.07577512534228,
+        -19.115327299887046,
+        -20.03311615938222,
+    ])
+    tol = {np.float32: 1e-6, np.float64: 1e-14}
+    self.assertAllClose(lsp_special.betaln(a, b), expected,
+                        atol=tol, rtol=tol, check_dtypes=False)
+    self.assertAllClose(lsp_special.betaln(b, a), expected,
+                        atol=tol, rtol=tol, check_dtypes=False)
+
   def test_gammaln_exact_zeros_and_special_values(self):
     # Exact zeros at x = 1.0 and x = 2.0
     self.assertEqual(float(lsp_special.gammaln(np.float32(1.0))), 0.0)

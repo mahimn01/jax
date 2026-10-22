@@ -25,7 +25,7 @@ def algdiv(a: ArrayLike, b: ArrayLike) -> Array:
     c5 = -0.165322962780713e-02
     h = a / b
     c = h / (1 + h)
-    x = h / (1 + h)
+    x = 1 / (1 + h)
     d = b + (a - 0.5)
     # Set sN = (1 - x**n)/(1 - x)
     x2 = x * x
